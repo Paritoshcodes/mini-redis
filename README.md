@@ -12,8 +12,8 @@ I wanted to understand what happens *below* the API — how a server actually ac
 |------|----------------|--------|
 | 1 | TCP server — socket, bind, listen, accept | ✅ Done |
 | 2 | Read loop — recv(), raw RESP bytes visible | ✅ Done |
-| 3 | RESP parser — decode arrays, bulk strings | 🔄 In progress |
-| 4 | Commands — PING, ECHO | ⏳ Upcoming |
+| 3 | RESP parser — decode arrays, bulk strings | ✅ Done |
+| 4 | Commands — PING, ECHO | 🔄 In progress |
 | 5 | In-memory store — SET, GET, DEL | ⏳ Upcoming |
 | 6 | Key expiry — EX, PX, TTL | ⏳ Upcoming |
 | 7 | Concurrent clients — epoll event loop | ⏳ Upcoming |
