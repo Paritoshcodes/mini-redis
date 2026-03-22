@@ -11,8 +11,8 @@ I wanted to understand what happens *below* the API — how a server actually ac
 | Part | What gets built | Status |
 |------|----------------|--------|
 | 1 | TCP server — socket, bind, listen, accept | ✅ Done |
-| 2 | Read loop — recv(), raw RESP bytes visible | 🔄 In progress |
-| 3 | RESP parser — decode arrays, bulk strings | ⏳ Upcoming |
+| 2 | Read loop — recv(), raw RESP bytes visible | ✅ Done |
+| 3 | RESP parser — decode arrays, bulk strings | 🔄 In progress |
 | 4 | Commands — PING, ECHO | ⏳ Upcoming |
 | 5 | In-memory store — SET, GET, DEL | ⏳ Upcoming |
 | 6 | Key expiry — EX, PX, TTL | ⏳ Upcoming |
