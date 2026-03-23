@@ -16,7 +16,7 @@ I wanted to understand what happens *below* the API — how a server actually ac
 | 4 | Commands — PING, ECHO | ✅ Done |
 | 5 | In-memory store — SET, GET, DEL | ✅ Done |
 | 6 | Key expiry — EX, PX, TTL | ✅ Done |
-| 7 | Concurrent clients — epoll event loop | 🔄 In progress |
+| 7 | Concurrent clients — epoll event loop | ✅ Done |
 
 ## How to build and run
 ```bash
