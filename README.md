@@ -15,8 +15,8 @@ I wanted to understand what happens *below* the API — how a server actually ac
 | 3 | RESP parser — decode arrays, bulk strings | ✅ Done |
 | 4 | Commands — PING, ECHO | ✅ Done |
 | 5 | In-memory store — SET, GET, DEL | ✅ Done |
-| 6 | Key expiry — EX, PX, TTL | 🔄 In progress |
-| 7 | Concurrent clients — epoll event loop | ⏳ Upcoming |
+| 6 | Key expiry — EX, PX, TTL | ✅ Done |
+| 7 | Concurrent clients — epoll event loop | 🔄 In progress |
 
 ## How to build and run
 ```bash
