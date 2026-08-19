@@ -1,0 +1,7 @@
+************************************* Invoked: Thu Aug 20 03:01:39 2026
+[0] Arguments: C:\Users\kwell\AppData\Local\Temp\WinGet\MSYS2.MSYS2.20260611\msys2-x86_64-20260611.exe, install, --confirm-command, --root, C:\msys64
+[4] Operations sanity check succeeded.
+[7] Using metadata cache from "C:/Users/kwell/AppData/Local/cache\\qt-installer-framework\\d75f1c19-3379-3717-ae8d-1404b51494a9"
+[7] Found 0 cached items.
+[9] Loaded control script ":/metadata/installer-config/control_js"
+[9] TargetDirectoryInUse : Error : The directory you selected already exists and contains an installation. Choose a different target for installation.
