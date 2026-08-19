@@ -9,9 +9,11 @@
 #include <thread>
 #include <cctype>
 #include <cerrno>
+#include <cstdlib>
 #include <signal.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <netinet/tcp.h>
 #include <unistd.h>
 #include <fcntl.h>         // fcntl() for non-blocking mode
 #include <sys/epoll.h>     // epoll_create1, epoll_ctl, epoll_wait
@@ -291,6 +293,34 @@ std::string handle_command(int fd, const std::vector<std::string>& cmd) {
         if (cmd.size() < 2) return resp_error("wrong number of arguments for 'persist'");
         return resp_integer(static_cast<int>(expiry_map.erase(cmd[1])));
     }
+    if (name == "EXPIRE") {
+        if (cmd.size() != 3) return resp_error("wrong number of arguments for 'expire'");
+        int seconds = 0;
+        if (!parse_int(cmd[2], seconds)) {
+            return resp_error("value is not an integer or out of range");
+        }
+        if (check_and_expire(cmd[1])) return resp_integer(0);
+        if (!store.count(cmd[1]))     return resp_integer(0);
+        expiry_map[cmd[1]] = std::chrono::steady_clock::now() + std::chrono::seconds(seconds);
+        return resp_integer(1);
+    }
+    if (name == "INCR") {
+        if (cmd.size() != 2) return resp_error("wrong number of arguments for 'incr'");
+        check_and_expire(cmd[1]);
+        long long value = 0;
+        auto it = store.find(cmd[1]);
+        if (it != store.end()) {
+            errno = 0;
+            char* end = nullptr;
+            value = std::strtoll(it->second.c_str(), &end, 10);
+            if (errno != 0 || end == it->second.c_str() || *end != '\0') {
+                return resp_error("value is not an integer or out of range");
+            }
+        }
+        value += 1;
+        store[cmd[1]] = std::to_string(value);
+        return ":" + std::to_string(value) + "\r\n";
+    }
     if (name == "EXISTS") {
         if (cmd.size() < 2) return resp_error("wrong number of arguments for 'exists'");
         if (check_and_expire(cmd[1])) return resp_integer(0);
@@ -449,6 +479,8 @@ int main() {
 
                 // Set client fd non-blocking and register with epoll
                 set_nonblocking(client_fd);
+                int nd = 1;
+                setsockopt(client_fd, IPPROTO_TCP, TCP_NODELAY, &nd, sizeof(nd));
                 clients.emplace(client_fd, Client{});
                 epoll_event cev{};
                 cev.events  = EPOLLIN;
@@ -473,6 +505,7 @@ int main() {
                 Client& client = client_it->second;
                 bool close_client = false;
 
+                std::string outbuf;
                 while (true) {
                     char buffer[BUFFER_SIZE];
                     ssize_t bytes_read = recv(ready_fd, buffer, sizeof(buffer), 0);
@@ -532,25 +565,20 @@ int main() {
                         continue;
                     }
 
-                    std::string response = handle_command(ready_fd, cmd);
-                    if (!send_all(ready_fd, response)) {
-                        disconnect(ready_fd, epfd);
-                        close_client = true;
-                        break;
-                    }
-
-                    if (!cmd.empty()) {
-                        std::cout << "  [fd=" << ready_fd << "] "
-                                  << cmd[0];
-                        for (size_t j = 1; j < cmd.size(); j++)
-                            std::cout << " " << cmd[j];
-                        std::cout << "\n";
-                    }
+                    outbuf += handle_command(ready_fd, cmd);
 
                     if (uppercase_copy(cmd[0]) == "QUIT") {
+                        if (!outbuf.empty()) { send_all(ready_fd, outbuf); outbuf.clear(); }
                         disconnect(ready_fd, epfd);
                         close_client = true;
                         break;
+                    }
+                }
+
+                if (!close_client && !outbuf.empty()) {
+                    if (!send_all(ready_fd, outbuf)) {
+                        disconnect(ready_fd, epfd);
+                        close_client = true;
                     }
                 }
 

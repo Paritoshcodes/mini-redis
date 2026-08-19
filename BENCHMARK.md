@@ -1,20 +1,20 @@
 # Benchmark Notes
 
-This repo now includes a reproducible benchmark harness at [bench/run-bench.sh](bench/run-bench.sh).
+Reproducible benchmark harness: [bench/run-bench.sh](bench/run-bench.sh).
 
 ## Methodology
 
-- Build with `g++ -O2 -Wall -Wextra -std=c++17 -o mini-redis server.cpp`
-- Start the server on port 6379 with `nohup ./mini-redis > /tmp/server.log 2>&1 &`
-- Run `redis-benchmark -t ping,set,get -n 100000 -c 50 -q`
-- Run `redis-benchmark -t ping,set,get -n 100000 -c 50 -P 16 -q`
-- Run the pub/sub smoke test that publishes 1000 messages to one subscriber
+- Build: `g++ -O2 -Wall -Wextra -std=c++17 -o mini-redis server.cpp`
+- Server: `./mini-redis` on 127.0.0.1:6379
+- Baseline: `redis-benchmark -t ping,set,get -n 100000 -c 50 -q`
+- Pipelined: `redis-benchmark -t ping,set,get -n 500000 -c 50 -P 16 -q`
+- Peak: `redis-benchmark -t ping,set,get -n 1000000 -c 50 -P 128 -q`
+- Pub/sub: 1000 messages published to one subscriber; the script asserts all 1000 delivered
+- The script asserts a portable 1,000 req/sec floor on every reported figure and exits non-zero on failure
 
 ## Results
 
-The authoritative benchmark results should be captured by running `./bench/run-bench.sh` on a Linux host with the required toolchain installed.
-
-This session could not regenerate local benchmark numbers because the Windows shell in this workspace does not currently expose `g++`, `redis-cli`, `redis-benchmark`, `nc`, or a working WSL environment.
+Pending capture: run `./bench/run-bench.sh` on a Linux host with `g++`, `redis-cli`, `redis-benchmark`, and `ss` available, then record the emitted tables here. The harness asserts a 1,000 req/sec floor on every figure and 1000/1000 pub/sub delivery, and exits non-zero on any failure.
 
 ## Reproduction
 

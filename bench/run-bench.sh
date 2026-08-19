@@ -23,7 +23,7 @@ sleep 0.5
 
 check_rps_floor() {
   local output=$1
-  printf '%s\n' "$output" | awk '
+  printf '%s\n' "$output" | tr '\r' '\n' | awk '
     /requests per second/ {
       if ($2 + 0 < 1000) {
         printf("throughput floor failed: %s\n", $0) > "/dev/stderr"
@@ -44,10 +44,15 @@ baseline_output=$(timeout 60 redis-benchmark -t ping,set,get -n 100000 -c 50 -q)
 printf '%s\n' "$baseline_output"
 check_rps_floor "$baseline_output"
 
-echo "== pipelined =="
-pipelined_output=$(timeout 60 redis-benchmark -t ping,set,get -n 100000 -c 50 -P 16 -q)
+echo "== pipelined P16 =="
+pipelined_output=$(timeout 60 redis-benchmark -t ping,set,get -n 500000 -c 50 -P 16 -q)
 printf '%s\n' "$pipelined_output"
 check_rps_floor "$pipelined_output"
+
+echo "== pipelined P128 =="
+peak_output=$(timeout 120 redis-benchmark -t ping,set,get -n 1000000 -c 50 -P 128 -q)
+printf '%s\n' "$peak_output"
+check_rps_floor "$peak_output"
 
 echo "== pubsub =="
 sub_out=$(mktemp)

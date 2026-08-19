@@ -31,19 +31,26 @@ Then in a second terminal:
 redis-cli ping     # should return PONG
 redis-cli set name paritosh
 redis-cli get name
+redis-cli incr hits
+redis-cli expire name 60
+redis-cli ttl name
+```
 
 ## Benchmarks
 
 Reproducible throughput checks live in [bench/run-bench.sh](bench/run-bench.sh) and the captured run notes are in [BENCHMARK.md](BENCHMARK.md). Run `./bench/run-bench.sh` on a Linux host with `g++`, `redis-cli`, `redis-benchmark`, and `ss` available to reproduce the published numbers.
 
-The claim floor is 1K+ commands/sec. The benchmark script asserts that floor for both the baseline and pipelined Redis benchmark runs.
+See [BENCHMARK.md](BENCHMARK.md) for methodology and captured results. The benchmark script asserts a portable 1K+ floor on every reported figure so the harness passes on any hardware.
+
+## Supported commands
+
+`PING`, `ECHO`, `QUIT`, `SET` (with `EX`/`PX`), `GET`, `DEL`, `INCR`, `EXPIRE`, `TTL`, `PTTL`, `PERSIST`, `EXISTS`, `KEYS`, `DBSIZE`, `FLUSHALL`, `SUBSCRIBE`, `UNSUBSCRIBE`, `PUBLISH`.
 
 ## Pub/sub
 
 ```bash
 redis-cli subscribe news
 redis-cli publish news hello
-```
 ```
 
 ## Tech
