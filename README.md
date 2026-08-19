@@ -40,7 +40,7 @@ redis-cli ttl name
 
 Reproducible throughput checks live in [bench/run-bench.sh](bench/run-bench.sh) and the captured run notes are in [BENCHMARK.md](BENCHMARK.md). Run `./bench/run-bench.sh` on a Linux host with `g++`, `redis-cli`, `redis-benchmark`, and `ss` available to reproduce the published numbers.
 
-See [BENCHMARK.md](BENCHMARK.md) for methodology and captured results. The benchmark script asserts a portable 1K+ floor on every reported figure so the harness passes on any hardware.
+Measured on the captured run (single core): 150K+ commands/sec baseline, 1M+ pipelined, peaking at 4.2M+ with deep pipelining — see [BENCHMARK.md](BENCHMARK.md) for the full tables. The benchmark script asserts a portable 1K+ floor on every reported figure so the harness passes on any hardware.
 
 ## Supported commands
 
